@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, ChangeEvent } from "react";
@@ -44,10 +45,7 @@ interface FormDataType {
   linkBlocks: LinkBlock[];
 }
 
-// Add global styles for form inputs
-const inputStyles = "w-full p-2 border border-black rounded placeholder-gray-600";
-const textareaStyles = "w-full p-2 border border-black rounded placeholder-gray-600";
-const inputWithButtonStyles = "w-full p-2 border border-black rounded-l placeholder-gray-600";
+
 
 export default function Home() {
   return (
