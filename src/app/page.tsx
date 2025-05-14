@@ -45,8 +45,6 @@ interface FormDataType {
   linkBlocks: LinkBlock[];
 }
 
-
-
 export default function Home() {
   return (
     <main className="container mx-auto p-4 max-w-4xl">
@@ -67,7 +65,7 @@ function DentalDataForm() {
       {
         name: "",
         link: "",
-      }
+      },
     ],
     sections: [
       {
@@ -87,29 +85,29 @@ function DentalDataForm() {
       {
         title: "",
         link: "",
-      }
+      },
     ],
     linkBlocks: [
       {
         title: "",
         subTitle: "",
         link: "",
-      }
+      },
     ],
   });
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, 
-    section: "root" | "callToActions" | "sections" | "linkCards" | "linkBlocks", 
-    field: string, 
-    index: number | null = null, 
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    section: "root" | "callToActions" | "sections" | "linkCards" | "linkBlocks",
+    field: string,
+    index: number | null = null,
     nestedField: "description" | "bulletPoints" | null = null
   ) => {
     const { value } = e.target;
-    
-    setFormData(prev => {
+
+    setFormData((prev) => {
       const newData = { ...prev };
-      
+
       if (section === "root") {
         (newData as any)[field] = value;
       } else if (section === "callToActions" && index !== null) {
@@ -118,8 +116,13 @@ function DentalDataForm() {
         if (nestedField) {
           if (nestedField === "description") {
             (newData.sections[index].description as any)[field] = value;
-          } else if (nestedField === "bulletPoints" && typeof index === "number") {
-            newData.sections[index].description.bulletPoints[field as unknown as number] = value;
+          } else if (
+            nestedField === "bulletPoints" &&
+            typeof index === "number"
+          ) {
+            newData.sections[index].description.bulletPoints[
+              field as unknown as number
+            ] = value;
           }
         } else {
           (newData.sections[index] as any)[field] = value;
@@ -129,7 +132,7 @@ function DentalDataForm() {
       } else if (section === "linkBlocks" && index !== null) {
         (newData.linkBlocks[index] as any)[field] = value;
       }
-      
+
       return newData;
     });
   };
@@ -138,9 +141,12 @@ function DentalDataForm() {
     setFormName(e.target.value);
   };
 
-  const handleBulletPointsTextChange = (e: ChangeEvent<HTMLTextAreaElement>, sectionIndex: number) => {
+  const handleBulletPointsTextChange = (
+    e: ChangeEvent<HTMLTextAreaElement>,
+    sectionIndex: number
+  ) => {
     const { value } = e.target;
-    
+
     // Update the raw text array
     const newBulletPointsText = [...bulletPointsText];
     // Ensure the array has enough elements
@@ -153,57 +159,57 @@ function DentalDataForm() {
 
   const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: checked
+      [name]: checked,
     }));
   };
 
   const handleAddCallToAction = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      callToActions: [...prev.callToActions, { name: "", link: "" }]
+      callToActions: [...prev.callToActions, { name: "", link: "" }],
     }));
   };
 
   const handleRemoveCallToAction = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      callToActions: prev.callToActions.filter((_, i) => i !== index)
+      callToActions: prev.callToActions.filter((_, i) => i !== index),
     }));
   };
 
   const handleAddLinkCard = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      linkCards: [...prev.linkCards, { title: "", link: "" }]
+      linkCards: [...prev.linkCards, { title: "", link: "" }],
     }));
   };
 
   const handleRemoveLinkCard = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      linkCards: prev.linkCards.filter((_, i) => i !== index)
+      linkCards: prev.linkCards.filter((_, i) => i !== index),
     }));
   };
 
   const handleAddLinkBlock = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      linkBlocks: [...prev.linkBlocks, { title: "", subTitle: "", link: "" }]
+      linkBlocks: [...prev.linkBlocks, { title: "", subTitle: "", link: "" }],
     }));
   };
 
   const handleRemoveLinkBlock = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      linkBlocks: prev.linkBlocks.filter((_, i) => i !== index)
+      linkBlocks: prev.linkBlocks.filter((_, i) => i !== index),
     }));
   };
 
   const handleAddSection = () => {
-    setBulletPointsText(prev => [...prev, ""]);
-    setFormData(prev => ({
+    setBulletPointsText((prev) => [...prev, ""]);
+    setFormData((prev) => ({
       ...prev,
       sections: [
         ...prev.sections,
@@ -216,57 +222,64 @@ function DentalDataForm() {
             bulletPoints: [],
           },
           image: "",
-        }
-      ]
+        },
+      ],
     }));
   };
 
   const handleRemoveSection = (sectionIndex: number) => {
-    setBulletPointsText(prev => prev.filter((_, i) => i !== sectionIndex));
-    setFormData(prev => ({
+    setBulletPointsText((prev) => prev.filter((_, i) => i !== sectionIndex));
+    setFormData((prev) => ({
       ...prev,
-      sections: prev.sections.filter((_, i) => i !== sectionIndex)
+      sections: prev.sections.filter((_, i) => i !== sectionIndex),
     }));
   };
 
   const downloadJson = () => {
     // Process the form data to parse bullet points before downloading
     const processedData = { ...formData };
-    
-    // Process each section's bullet points
+
+    // Generate normalized name for URLs
+    const normalizedName = formName.trim()
+      ? formName.trim().replace(/\s+/g, "-").toLowerCase()
+      : "dental-data";
+
+    // Set hero image URL based on name
+    processedData.heroImage = `/images/${normalizedName}/hero.webp`;
+
+    // Process each section's bullet points and set section image URLs
     processedData.sections = formData.sections.map((section, index) => {
       // Get the raw text for this section
       const rawText = bulletPointsText[index] || "";
-      
+
       // Parse the bullet points
       const bulletPoints = rawText
-        .replace(/•/g, ',') // Replace bullet characters with commas
-        .split(',') // Split by comma
-        .map(item => item.trim())
-        .filter(item => item !== '');
-      
-      // Return the updated section
+        .replace(/•/g, ",") // Replace bullet characters with commas
+        .split(",") // Split by comma
+        .map((item) => item.trim())
+        .filter((item) => item !== "");
+
+      // Return the updated section with dynamic image URL
       return {
         ...section,
         description: {
           ...section.description,
-          bulletPoints
-        }
+          bulletPoints,
+        },
+        image: `/images/${normalizedName}/section${index + 1}.webp`,
       };
     });
 
     const dataStr = JSON.stringify(processedData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(dataBlob);
-    
-    const link = document.createElement('a');
+
+    const link = document.createElement("a");
     link.href = url;
-    
+
     // Use the form name for the file name, or default to 'dental-data' if empty
-    const fileName = formName.trim() ? 
-      formName.trim().replace(/\s+/g, '-').toLowerCase() + '.json' : 
-      'dental-data.json';
-    
+    const fileName = normalizedName + ".json";
+
     link.download = fileName;
     document.body.appendChild(link);
     link.click();
@@ -290,7 +303,8 @@ function DentalDataForm() {
             placeholder="Enter name for the JSON file (e.g. missing-teeth-treatment)"
           />
           <p className="text-sm text-gray-500 mt-1">
-            This name will be used for the downloaded JSON file and will not be included in the data.
+            This name will be used for the downloaded JSON file and to generate
+            image paths.
           </p>
         </div>
       </section>
@@ -298,19 +312,6 @@ function DentalDataForm() {
       <section className="bg-gray-50 p-6 rounded-lg">
         <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
         <div className="grid grid-cols-1 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Hero Image
-            </label>
-            <input
-              type="text"
-              value={formData.heroImage}
-              onChange={(e) => handleChange(e, "root", "heroImage")}
-              className="w-full p-2 border rounded"
-              placeholder="Enter image path (e.g. /images/hero.webp)"
-            />
-          </div>
-          
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -343,7 +344,10 @@ function DentalDataForm() {
       <section className="bg-gray-50 p-6 rounded-lg">
         <h2 className="text-xl font-semibold mb-4">Call To Actions</h2>
         {formData.callToActions.map((cta, index) => (
-          <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 pb-4 border-b">
+          <div
+            key={index}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 pb-4 border-b"
+          >
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Name
@@ -351,7 +355,9 @@ function DentalDataForm() {
               <input
                 type="text"
                 value={cta.name}
-                onChange={(e) => handleChange(e, "callToActions", "name", index)}
+                onChange={(e) =>
+                  handleChange(e, "callToActions", "name", index)
+                }
                 className="w-full p-2 border rounded"
                 placeholder="Enter CTA name"
               />
@@ -364,7 +370,9 @@ function DentalDataForm() {
                 <input
                   type="text"
                   value={cta.link}
-                  onChange={(e) => handleChange(e, "callToActions", "link", index)}
+                  onChange={(e) =>
+                    handleChange(e, "callToActions", "link", index)
+                  }
                   className="w-full p-2 border rounded-l"
                   placeholder="Enter CTA link"
                 />
@@ -401,7 +409,7 @@ function DentalDataForm() {
             Add New Section
           </button>
         </div>
-        
+
         {formData.sections.map((section, sectionIndex) => (
           <div key={sectionIndex} className="mb-6 pb-6 border-b relative">
             <div className="absolute top-0 right-0">
@@ -415,9 +423,11 @@ function DentalDataForm() {
                 </button>
               )}
             </div>
-            
-            <h3 className="text-lg font-medium mb-4 mt-2">Section {sectionIndex + 1}</h3>
-            
+
+            <h3 className="text-lg font-medium mb-4 mt-2">
+              Section {sectionIndex + 1}
+            </h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -426,7 +436,9 @@ function DentalDataForm() {
                 <input
                   type="text"
                   value={section.headingLight}
-                  onChange={(e) => handleChange(e, "sections", "headingLight", sectionIndex)}
+                  onChange={(e) =>
+                    handleChange(e, "sections", "headingLight", sectionIndex)
+                  }
                   className="w-full p-2 border rounded"
                   placeholder="Enter light heading"
                 />
@@ -438,52 +450,57 @@ function DentalDataForm() {
                 <input
                   type="text"
                   value={section.headingBold}
-                  onChange={(e) => handleChange(e, "sections", "headingBold", sectionIndex)}
+                  onChange={(e) =>
+                    handleChange(e, "sections", "headingBold", sectionIndex)
+                  }
                   className="w-full p-2 border rounded"
                   placeholder="Enter bold heading"
                 />
               </div>
             </div>
-            
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Image
-              </label>
-              <input
-                type="text"
-                value={section.image}
-                onChange={(e) => handleChange(e, "sections", "image", sectionIndex)}
-                className="w-full p-2 border rounded"
-                placeholder="Enter image path"
-              />
-            </div>
-            
+
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Paragraph 1
               </label>
               <textarea
                 value={section.description.paragraph1}
-                onChange={(e) => handleChange(e, "sections", "paragraph1", sectionIndex, "description")}
+                onChange={(e) =>
+                  handleChange(
+                    e,
+                    "sections",
+                    "paragraph1",
+                    sectionIndex,
+                    "description"
+                  )
+                }
                 className="w-full p-2 border rounded"
                 rows={3}
                 placeholder="Enter first paragraph"
               />
             </div>
-            
+
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Paragraph 2
               </label>
               <textarea
                 value={section.description.paragraph2}
-                onChange={(e) => handleChange(e, "sections", "paragraph2", sectionIndex, "description")}
+                onChange={(e) =>
+                  handleChange(
+                    e,
+                    "sections",
+                    "paragraph2",
+                    sectionIndex,
+                    "description"
+                  )
+                }
                 className="w-full p-2 border rounded"
                 rows={3}
                 placeholder="Enter second paragraph"
               />
             </div>
-            
+
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Bullet Points
@@ -505,7 +522,7 @@ function DentalDataForm() {
 
       <section className="bg-gray-50 p-6 rounded-lg">
         <h2 className="text-xl font-semibold mb-4">Link Options</h2>
-        
+
         <div className="flex space-x-4 mb-4">
           <div className="flex items-center">
             <input
@@ -516,11 +533,14 @@ function DentalDataForm() {
               onChange={handleCheckboxChange}
               className="mr-2"
             />
-            <label htmlFor="isLinkCards" className="text-sm font-medium text-gray-700">
+            <label
+              htmlFor="isLinkCards"
+              className="text-sm font-medium text-gray-700"
+            >
               Show Link Cards
             </label>
           </div>
-          
+
           <div className="flex items-center">
             <input
               type="checkbox"
@@ -530,17 +550,23 @@ function DentalDataForm() {
               onChange={handleCheckboxChange}
               className="mr-2"
             />
-            <label htmlFor="isLinkBlocks" className="text-sm font-medium text-gray-700">
+            <label
+              htmlFor="isLinkBlocks"
+              className="text-sm font-medium text-gray-700"
+            >
               Show Link Blocks
             </label>
           </div>
         </div>
-        
+
         {formData.isLinkCards && (
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Link Cards</h3>
             {formData.linkCards.map((card, index) => (
-              <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 pb-4 border-b">
+              <div
+                key={index}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 pb-4 border-b"
+              >
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Title
@@ -548,7 +574,9 @@ function DentalDataForm() {
                   <input
                     type="text"
                     value={card.title}
-                    onChange={(e) => handleChange(e, "linkCards", "title", index)}
+                    onChange={(e) =>
+                      handleChange(e, "linkCards", "title", index)
+                    }
                     className="w-full p-2 border rounded"
                     placeholder="Enter card title"
                   />
@@ -561,7 +589,9 @@ function DentalDataForm() {
                     <input
                       type="text"
                       value={card.link}
-                      onChange={(e) => handleChange(e, "linkCards", "link", index)}
+                      onChange={(e) =>
+                        handleChange(e, "linkCards", "link", index)
+                      }
                       className="w-full p-2 border rounded-l"
                       placeholder="Enter card link"
                     />
@@ -587,12 +617,15 @@ function DentalDataForm() {
             </button>
           </div>
         )}
-        
+
         {formData.isLinkBlocks && (
           <div>
             <h3 className="text-lg font-medium mb-3">Link Blocks</h3>
             {formData.linkBlocks.map((block, index) => (
-              <div key={index} className="grid grid-cols-1 gap-4 mb-4 pb-4 border-b">
+              <div
+                key={index}
+                className="grid grid-cols-1 gap-4 mb-4 pb-4 border-b"
+              >
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Title
@@ -600,7 +633,9 @@ function DentalDataForm() {
                   <input
                     type="text"
                     value={block.title}
-                    onChange={(e) => handleChange(e, "linkBlocks", "title", index)}
+                    onChange={(e) =>
+                      handleChange(e, "linkBlocks", "title", index)
+                    }
                     className="w-full p-2 border rounded"
                     placeholder="Enter block title"
                   />
@@ -612,7 +647,9 @@ function DentalDataForm() {
                   <input
                     type="text"
                     value={block.subTitle}
-                    onChange={(e) => handleChange(e, "linkBlocks", "subTitle", index)}
+                    onChange={(e) =>
+                      handleChange(e, "linkBlocks", "subTitle", index)
+                    }
                     className="w-full p-2 border rounded"
                     placeholder="Enter block subtitle"
                   />
@@ -625,7 +662,9 @@ function DentalDataForm() {
                     <input
                       type="text"
                       value={block.link}
-                      onChange={(e) => handleChange(e, "linkBlocks", "link", index)}
+                      onChange={(e) =>
+                        handleChange(e, "linkBlocks", "link", index)
+                      }
                       className="w-full p-2 border rounded-l"
                       placeholder="Enter block link"
                     />
